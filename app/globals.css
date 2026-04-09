@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-primary: #006d37;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2ecc71;
+  --color-on-primary-container: #005027;
+  --color-primary-fixed: #aaf7c0;
+  --color-primary-fixed-dim: #4ae183;
+  --color-on-primary-fixed: #00210c;
+  --color-on-primary-fixed-variant: #005228;
+  --color-inverse-primary: #4ae183;
+
+  --color-secondary: #336943;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #b5f1c0;
+  --color-on-secondary-container: #396f48;
+  --color-secondary-fixed: #b5f1c0;
+  --color-secondary-fixed-dim: #9ad4a5;
+  --color-on-secondary-fixed: #00210c;
+  --color-on-secondary-fixed-variant: #19512d;
+
+  --color-tertiary: #98472a;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ff9875;
+  --color-on-tertiary-container: #772e14;
+  --color-tertiary-fixed: #ffdbd0;
+  --color-tertiary-fixed-dim: #ffb59d;
+  --color-on-tertiary-fixed: #390c00;
+  --color-on-tertiary-fixed-variant: #793015;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-surface: #f3fcf1;
+  --color-surface-dim: #d4dcd2;
+  --color-surface-bright: #f3fcf1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eef6eb;
+  --color-surface-container: #e8f0e5;
+  --color-surface-container-high: #e2ebe0;
+  --color-surface-container-highest: #dce5da;
+  --color-surface-variant: #dce5da;
+  --color-surface-tint: #006d37;
+  --color-on-surface: #161d17;
+  --color-on-surface-variant: #3d4a3e;
+  --color-inverse-surface: #2b322b;
+  --color-inverse-on-surface: #ebf3e8;
+
+  --color-background: #f3fcf1;
+  --color-on-background: #161d17;
+
+  --color-outline: #6c7b6d;
+  --color-outline-variant: #bbcbbb;
+
+  --color-emphasis-surface: #1a2a1e;
+  --color-emphasis-on-surface: #f3fcf1;
+  --color-emphasis-accent: #4ae183;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-headline: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-bounce-slow: bounce 3s infinite;
+  --animate-fade-in-up: fadeInUp 0.6s ease-out forwards;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.dark {
+  --color-background: #161d17;
+  --color-on-background: #e2ebe0;
+  --color-surface: #161d17;
+  --color-surface-dim: #141b14;
+  --color-surface-bright: #2d3a2d;
+
+  --color-surface-container-lowest: #111811;
+  --color-surface-container-low:    #1e2920;
+  --color-surface-container:        #222e22;
+  --color-surface-container-high:   #2c3a2c;
+  --color-surface-container-highest: #36433a;
+  --color-surface-variant: #3d4a3e;
+
+  --color-on-surface: #e2ebe0;
+  --color-on-surface-variant: #b5c9b5;
+
+  --color-outline: #8a9e8b;
+  --color-outline-variant: #3d4a3e;
+
+  --color-inverse-surface: #e2ebe0;
+  --color-inverse-on-surface: #2b322b;
+
+  --color-emphasis-surface: #2c3a2c;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+.hero-gradient-text {
+  background: linear-gradient(135deg, #006d37 0%, #2ecc71 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
 }
