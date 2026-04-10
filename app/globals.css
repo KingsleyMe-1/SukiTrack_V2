@@ -70,6 +70,12 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-bounce-slow: bounce 3s infinite;
   --animate-fade-in-up: fadeInUp 0.6s ease-out forwards;
+
+  --color-error-container: #fdecea;
+  --color-warning: #e67e22;
+
+  --shadow-premium: 0 10px 40px -10px rgba(0, 109, 55, 0.08);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 @keyframes fadeInUp {
@@ -133,4 +139,39 @@ body {
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
+}
+
+/* ── Dashboard Shared Utilities ─────────────────────────────────────── */
+
+.editorial-gradient {
+  background: linear-gradient(135deg, #006d37 0%, #008f47 100%);
+  box-shadow: 0 20px 40px -12px rgba(0, 109, 55, 0.25);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-nav-active {
+  background: rgba(0, 109, 55, 0.05);
+  color: #006d37;
+  position: relative;
+}
+
+.dashboard-nav-active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: #006d37;
+  border-radius: 4px 0 0 4px;
+  box-shadow: -2px 0 8px rgba(0, 109, 55, 0.3);
+}
+
+.bar-transition {
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
