@@ -11,17 +11,17 @@ export function StatsGrid({
   const isIncrease = revenueChangePercent >= 0;
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-5 gap-6">
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
       {/* ── Total Revenue Card ─────────────────────────────────────── */}
-      <div className="col-span-1 md:col-span-3 p-8 md:p-10 rounded-3xl editorial-gradient text-on-primary flex flex-col justify-between min-h-[220px] md:min-h-[260px] relative overflow-hidden group">
-        <div className="absolute top-8 right-8 md:top-10 md:right-10 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
+      <div className="col-span-1 lg:col-span-3 p-8 md:p-10 rounded-3xl editorial-gradient text-on-primary flex flex-col justify-between min-h-[220px] md:min-h-[260px] relative overflow-hidden group">
+        <div className="absolute top-8 right-8 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
           <span className="material-symbols-outlined text-xl">payments</span>
         </div>
-        <div>
+        <div className="pr-16">
           <span className="text-[11px] uppercase tracking-[0.2em] text-white/70 font-bold">
             Total Revenue Today
           </span>
-          <div className="text-4xl md:text-6xl font-black mt-4 tracking-tighter">
+          <div className="text-4xl md:text-5xl lg:text-6xl font-black mt-4 tracking-tighter">
             {formatPHP(totalRevenue)}
           </div>
         </div>
@@ -37,17 +37,17 @@ export function StatsGrid({
       </div>
 
       {/* ── Outstanding Credit Card ─────────────────────────────────── */}
-      <div className="col-span-1 md:col-span-2 bg-surface-container-lowest p-8 md:p-10 rounded-3xl border border-outline-variant/30 shadow-premium flex flex-col justify-between min-h-[220px] md:min-h-[260px] relative">
-        <div className="absolute top-8 right-8 md:top-10 md:right-10 w-10 h-10 bg-tertiary/5 text-tertiary rounded-xl flex items-center justify-center">
+      <div className="col-span-1 lg:col-span-2 bg-surface-container-lowest p-8 md:p-10 rounded-3xl border border-outline-variant/30 shadow-premium flex flex-col justify-between min-h-[220px] md:min-h-[260px] relative">
+        <div className="absolute top-8 right-8 w-10 h-10 bg-tertiary/5 text-tertiary rounded-xl flex items-center justify-center">
           <span className="material-symbols-outlined text-xl">
             account_balance_wallet
           </span>
         </div>
-        <div>
+        <div className="pr-16">
           <span className="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-bold">
             Outstanding Credit
           </span>
-          <div className="text-3xl md:text-5xl font-black mt-4 text-on-surface tracking-tight">
+          <div className="text-3xl md:text-4xl lg:text-5xl font-black mt-4 text-on-surface tracking-tight">
             {formatPHP(outstandingCredit)}
           </div>
         </div>
