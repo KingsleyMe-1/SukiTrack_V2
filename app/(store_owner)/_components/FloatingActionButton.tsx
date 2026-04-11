@@ -14,14 +14,13 @@ export function FloatingActionButton() {
     >
       <span className="material-symbols-outlined text-2xl md:text-3xl">add</span>
 
-      {/* Hover tooltip */}
       <div
         className={`absolute right-full mr-4 md:mr-6 pointer-events-none transition-all duration-200 ${
           hovered ? "opacity-100 -translate-x-0" : "opacity-0 translate-x-2"
         }`}
         aria-hidden="true"
       >
-        <div className="bg-on-surface text-white text-[11px] font-bold px-4 py-2 rounded-xl shadow-xl whitespace-nowrap">
+        <div className="bg-accent text-foreground border border-border text-[11px] font-bold px-4 py-2 rounded-xl shadow-xl whitespace-nowrap">
           Quick Add Entry
         </div>
       </div>

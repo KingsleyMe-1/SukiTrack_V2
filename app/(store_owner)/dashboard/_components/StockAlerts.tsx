@@ -17,32 +17,32 @@ const statusConfig: Record<
   }
 > = {
   critical: {
-    dot: "bg-error",
-    badge: "bg-error-container/40 text-error",
-    label: (a) => `Critical: ${a.count ?? ""}`,
+    dot: "bg-destructive",
+    badge: "bg-destructive/15 text-destructive",
+    label: (a) => `Critical: ${a.count ?? ""}`
   },
   "out-of-stock": {
-    dot: "bg-error",
-    badge: "bg-error-container/40 text-error",
+    dot: "bg-destructive",
+    badge: "bg-destructive/15 text-destructive",
     label: () => "Out of Stock",
   },
   low: {
     dot: "bg-warning",
-    badge: "bg-warning/20 text-warning",
-    label: (a) => `Low: ${a.count ?? ""}`,
+    badge: "bg-warning/15 text-warning",
+    label: (a) => `Low: ${a.count ?? ""}`
   },
   stable: {
     dot: "bg-primary",
-    badge: "bg-secondary-container/40 text-primary",
+    badge: "bg-primary/10 text-primary",
     label: () => "Stable",
   },
 };
 
 export function StockAlerts({ alerts }: StockAlertsProps) {
   return (
-    <div className="lg:col-span-4 bg-surface-container-lowest rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-premium flex flex-col">
+    <div className="lg:col-span-4 bg-card rounded-3xl p-6 md:p-8 border border-border shadow-premium flex flex-col">
       <div className="flex items-center justify-between mb-6 md:mb-8">
-        <h3 className="text-lg font-extrabold tracking-tight text-on-surface">
+        <h3 className="text-lg font-extrabold tracking-tight text-foreground">
           Stock Alerts
         </h3>
       </div>
@@ -54,7 +54,7 @@ export function StockAlerts({ alerts }: StockAlertsProps) {
             <div
               key={`${alert.name}-${i}`}
               className={cn(
-                "flex items-center justify-between py-2 border-b border-outline-variant/10 last:border-0",
+                "flex items-center justify-between py-2 border-b border-border/50 last:border-0",
                 alert.status === "stable" && "opacity-60"
               )}
             >
@@ -62,7 +62,7 @@ export function StockAlerts({ alerts }: StockAlertsProps) {
                 <div
                   className={cn("w-2 h-2 rounded-full shrink-0", config.dot)}
                 />
-                <span className="text-sm font-semibold text-on-surface/80 truncate">
+                <span className="text-sm font-semibold text-foreground/80 truncate">
                   {alert.name}
                 </span>
               </div>
@@ -82,7 +82,7 @@ export function StockAlerts({ alerts }: StockAlertsProps) {
       <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-outline-variant/20">
         <Link
           href="/catalog"
-          className="block w-full bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface font-bold py-3 md:py-3.5 rounded-xl text-[11px] transition-all duration-300 uppercase tracking-[0.15em] shadow-sm text-center"
+          className="block w-full bg-accent hover:bg-primary hover:text-primary-foreground text-foreground font-bold py-3 md:py-3.5 rounded-xl text-[11px] transition-all duration-300 uppercase tracking-[0.15em] shadow-sm text-center"
         >
           View Full Inventory
         </Link>

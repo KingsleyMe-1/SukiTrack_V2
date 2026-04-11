@@ -10,7 +10,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile backdrop — closes sidebar on outside tap */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
@@ -21,7 +20,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main column — offset for fixed sidebar on desktop */}
       <div className="lg:ml-72 flex flex-col min-h-screen">
         <DashboardHeader onMenuToggle={() => setSidebarOpen((v) => !v)} />
         <main className="flex-1">{children}</main>

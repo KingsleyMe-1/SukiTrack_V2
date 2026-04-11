@@ -10,6 +10,7 @@ import type {
   StockAlert,
   ActivityItem,
 } from "@/app/types/dashboard";
+import { Footer } from "@/app/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Dashboard | SukiTrack",
@@ -79,44 +80,20 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col">
-      {/* Greeting banner */}
       <GreetingBanner userName="Arturo" alertCount={activeAlerts} />
 
-      {/* Page content */}
       <div className="px-6 md:px-10 py-6 space-y-8">
-        {/* Stats row */}
         <StatsGrid {...mockStats} />
 
-        {/* Visualization row */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <GrowthChart bars={mockBars} />
           <StockAlerts alerts={mockAlerts} />
         </section>
 
-        {/* Activity feed */}
         <ActivityFeed activities={mockActivities} />
       </div>
 
-      {/* Footer */}
-      <footer className="mt-auto py-8 md:py-10 px-6 md:px-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-outline-variant/10">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant font-bold opacity-40">
-          © 2026 SukiTrack Digital Atelier • Enterprise v2.4.0
-        </p>
-        <div className="flex space-x-6">
-          <a
-            href="#"
-            className="text-[10px] font-bold text-on-surface-variant/60 hover:text-primary transition-colors uppercase tracking-widest"
-          >
-            Support
-          </a>
-          <a
-            href="#"
-            className="text-[10px] font-bold text-on-surface-variant/60 hover:text-primary transition-colors uppercase tracking-widest"
-          >
-            Security
-          </a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
