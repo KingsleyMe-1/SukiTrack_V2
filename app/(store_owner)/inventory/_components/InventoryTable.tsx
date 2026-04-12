@@ -175,9 +175,6 @@ export function InventoryTable({ items }: InventoryTableProps) {
                   <td className="px-6 py-6 text-center font-black text-sm text-primary">
                     {formatPHP(item.price)}
                   </td>
-                  <td className="px-6 py-6 text-center font-black text-sm text-primary">
-                    {formatPHP(item.price)}
-                  </td>
 
                   <td className="px-8 py-6 text-center text-xs text-muted-foreground font-medium">
                     {formatRestockDate(item.lastRestock)}
