@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeToggleButton } from "@/app/components/ui/ThemeToggleButton";
+import Button from "@/app/components/ui/Button";
 
 interface DashboardHeaderProps {
   onMenuToggle: () => void;
@@ -20,12 +21,12 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
       <div className="hidden lg:block" aria-hidden="true" />
 
       <div className="flex items-center space-x-2">
-        <ThemeToggleButton className="text-muted-foreground hover:bg-card hover:shadow-sm rounded-xl" />
+        <ThemeToggleButton className="text-muted-foreground hover:bg-card hover:shadow-sm rounded-xl cursor-pointer" />
 
         <div className="relative">
           <button
             aria-label="View notifications"
-            className="p-2.5 text-muted-foreground hover:bg-card hover:shadow-sm transition-all duration-200 rounded-xl"
+            className="p-2.5 text-muted-foreground hover:bg-card hover:shadow-sm transition-all duration-200 rounded-xl cursor-pointer"
           >
             <span className="material-symbols-outlined">notifications</span>
           </button>
@@ -35,9 +36,7 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
           />
         </div>
 
-        <button className="ml-2 bg-primary text-on-primary text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-          Generate Report
-        </button>
+        <Button label="Generate Report" backgroundColor="bg-primary" />
       </div>
     </header>
   );

@@ -7,10 +7,9 @@ import Image from "next/image";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
-  { label: "Catalog", href: "/catalog", icon: "inventory_2" },
-  { label: "Inventory", href: "/inventory", icon: "warehouse" },
+  { label: "Inventory", href: "/inventory", icon: "inventory" },
   { label: "Stores", href: "/stores", icon: "storefront" },
-  { label: "Sukis", href: "/sukis", icon: "group" },
+  { label: "Customers", href: "/customers", icon: "group" },
 ] as const;
 
 interface SidebarProps {
