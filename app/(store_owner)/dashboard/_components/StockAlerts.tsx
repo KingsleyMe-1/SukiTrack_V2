@@ -81,7 +81,7 @@ export function StockAlerts({ alerts }: StockAlertsProps) {
 
       <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-outline-variant/20">
         <Link
-          href="/catalog"
+          href="/inventory"
           className="block w-full bg-accent hover:bg-primary hover:text-primary-foreground text-foreground font-bold py-3 md:py-3.5 rounded-xl text-[11px] transition-all duration-300 uppercase tracking-[0.15em] shadow-sm text-center"
         >
           View Full Inventory

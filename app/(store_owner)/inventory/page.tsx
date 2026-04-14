@@ -151,7 +151,6 @@ export default function InventoryPage() {
         <Header />
         <InventoryCatalog items={mockItems} categories={CATEGORIES} />
       </div>
-      <Footer />
     </div>
   );
 }

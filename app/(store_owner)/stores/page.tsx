@@ -95,7 +95,6 @@ export default function StoresPage() {
         <MarketIntelligenceBanner />
 
       </div>
-      <Footer />
     </div>
   );
 }

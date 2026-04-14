@@ -10,16 +10,12 @@ import type {
   StockAlert,
   ActivityItem,
 } from "@/app/types/dashboard";
-import { Footer } from "@/app/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Dashboard | SukiTrack",
   description: "Your store analytics at a glance.",
 };
 
-// ── Mock data stubs ──────────────────────────────────────────────────────────
-// Shaped identically to future Supabase query return types.
-// Replace each constant with an async server fetch when the data layer is ready.
 
 const mockStats: StatsGridProps = {
   totalRevenue: 14280,
@@ -73,7 +69,6 @@ const mockActivities: ActivityItem[] = [
   },
 ];
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const activeAlerts = mockAlerts.filter((a) => a.status !== "stable").length;
@@ -92,8 +87,6 @@ export default function DashboardPage() {
 
         <ActivityFeed activities={mockActivities} />
       </div>
-
-      <Footer />
     </div>
   );
 }
