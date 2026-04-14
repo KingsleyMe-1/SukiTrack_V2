@@ -50,9 +50,10 @@ function CreditAvatar({ initials, colorClass }: { initials: string; colorClass: 
 
 interface StoreCardProps {
   store: ManagedStore;
+  onManage?: () => void;
 }
 
-export function StoreCard({ store }: StoreCardProps) {
+export function StoreCard({ store, onManage }: StoreCardProps) {
   const { label: statusLabel, className: statusClassName } = statusConfig[store.status];
   const { barClass, textClass, label: stockLabel } = stockConfig[store.stockLevelStatus];
 
@@ -132,6 +133,7 @@ export function StoreCard({ store }: StoreCardProps) {
       </div>
 
       <button
+        onClick={onManage}
         className="w-full mt-auto py-2.5 rounded-xl border border-primary/30 text-primary text-xs font-bold hover:bg-primary/5 active:scale-95 transition-all cursor-pointer"
         aria-label={`Manage ${store.name}`}
       >

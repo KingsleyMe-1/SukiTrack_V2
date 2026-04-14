@@ -3,6 +3,8 @@ import { formatPHP } from "@/app/utils/format";
 import { StatusBadge } from "./StatusBadge";
 import { cn } from "@/app/utils/cn";
 import Image from "next/image";
+import { useState } from "react";
+import { ProductDetailsModal } from "./ProductDetailsModal";
 
 const HEADERS = [
   { label: "Product Name", className: "text-left" },
@@ -11,10 +13,34 @@ const HEADERS = [
   { label: "Cost", className: "text-center" },
   { label: "Price", className: "text-center" },
   { label: "Last Restock", className: "text-center" },
+  { label: "Last Updated", className: "text-center" },
 ] as const;
+
+type ModalType = InventoryItem | null;
 
 function formatRestockDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatLastUpdated(isoDate: string): string {
+  const date = new Date(isoDate);
+  const today = new Date();
+  const isToday =
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate();
+  if (isToday) {
+    return `Today, ${date.toLocaleTimeString("en-PH", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })}`;
+  }
+  return date.toLocaleDateString("en-PH", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -47,7 +73,15 @@ function ProductIcon({ item }: { item: InventoryItem }) {
   );
 }
 
-function MobileItemCard({ item, index }: { item: InventoryItem; index: number }) {
+function MobileItemCard({
+  item,
+  index,
+  onClick,
+}: {
+  item: InventoryItem;
+  index: number;
+  onClick: () => void;
+}) {
   const isOutOfStock = item.status === "out-of-stock";
   return (
     <div
@@ -56,6 +90,7 @@ function MobileItemCard({ item, index }: { item: InventoryItem; index: number })
         isOutOfStock && "opacity-70",
         index % 2 === 0 ? "bg-card" : "bg-background/40"
       )}
+      onClick={onClick}
     >
       <div className="flex items-start gap-3">
         <ProductIcon item={item} />
@@ -95,20 +130,41 @@ function MobileItemCard({ item, index }: { item: InventoryItem; index: number })
       <p className="mt-2 text-[10px] text-muted-foreground font-medium">
         Last Restock: {formatRestockDate(item.lastRestock)}
       </p>
+      {item.lastUpdated && (
+        <p className="mt-1 text-[10px] font-medium">
+          <span className="text-muted-foreground">Updated: </span>
+          <span className="text-primary font-black">{formatLastUpdated(item.lastUpdated)}</span>
+        </p>
+      )}
     </div>
   );
 }
 
 interface InventoryTableProps {
   items: InventoryItem[];
+  onUpdate?: (updated: InventoryItem) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function InventoryTable({ items }: InventoryTableProps) {
+export function InventoryTable({ items, onUpdate, onDelete }: InventoryTableProps) {
+  const [modal, setModal] = useState<ModalType>(null);
   return (
     <>
+      <ProductDetailsModal
+        item={modal}
+        onClose={() => setModal(null)}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+      />
+      
       <div className="md:hidden divide-y divide-border/50">
         {items.map((item, i) => (
-          <MobileItemCard key={item.id} item={item} index={i} />
+          <MobileItemCard
+            key={item.id}
+            item={item}
+            index={i}
+            onClick={() => setModal(item)}
+          />
         ))}
       </div>
 
@@ -140,6 +196,7 @@ export function InventoryTable({ items }: InventoryTableProps) {
                     isOutOfStock && "opacity-70",
                     i % 2 === 0 ? "bg-card" : "bg-background/40"
                   )}
+                  onClick={() => setModal(item)}
                 >
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
@@ -178,6 +235,16 @@ export function InventoryTable({ items }: InventoryTableProps) {
 
                   <td className="px-8 py-6 text-center text-xs text-muted-foreground font-medium">
                     {formatRestockDate(item.lastRestock)}
+                  </td>
+
+                  <td className="px-8 py-6 text-center text-xs font-medium">
+                    {item.lastUpdated ? (
+                      <span className="text-muted-foreground font-black">
+                        {formatLastUpdated(item.lastUpdated)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground/50">—</span>
+                    )}
                   </td>
                 </tr>
               );

@@ -19,5 +19,6 @@ export interface InventoryItem {
   cost: number;
   price: number;
   lastRestock: string;
+  lastUpdated?: string;
   imageUrl?: string;
 }

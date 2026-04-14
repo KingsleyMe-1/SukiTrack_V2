@@ -22,4 +22,7 @@ export interface ManagedStore {
   extraCreditCount: number;
   stockLevelPercent: number;
   stockLevelStatus: StockLevelStatus;
+  dailyTarget?: number;
+  manager?: string;
+  monthlyGrowthPercent?: number;
 }

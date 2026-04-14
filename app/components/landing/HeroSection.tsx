@@ -1,5 +1,7 @@
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import { GlassCard } from "@/app/components/ui/GlassCard";
 
 const floatingBadges = [
@@ -52,12 +54,16 @@ export function HeroSection() {
             SukiTrack is the intelligent companion for Philippine store owners. Manage inventory, track credit, and understand your profits in real-time.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Link
-              href="/login"
-              className="bg-gradient-to-br from-chart-4 to-primary text-primary-foreground px-7 py-3.5 rounded-full font-bold text-sm md:text-base hover:shadow-xl hover:shadow-primary/35 hover:-translate-y-0.5 active:scale-95 transition-all shadow-lg shadow-primary/20"
+            <button
+              onClick={() =>
+                document
+                  .getElementById("features")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+              className="bg-gradient-to-br from-chart-4 to-primary text-primary-foreground px-7 py-3.5 rounded-full font-bold text-sm md:text-base hover:shadow-xl hover:shadow-primary/35 hover:-translate-y-0.5 active:scale-95 transition-all shadow-lg shadow-primary/20 cursor-pointer"
             >
               Get Started
-            </Link>
+            </button>
             <Link href="/demo" className="px-7 py-3.5 rounded-full font-semibold text-sm md:text-base text-foreground border border-border hover:bg-secondary transition-all active:scale-95">
               Watch Demo
             </Link>

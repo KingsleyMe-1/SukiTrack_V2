@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/app/utils/cn";
 import Image from "next/image";
 
@@ -19,6 +20,8 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <aside
@@ -71,7 +74,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               person
             </span>
           </div>
-          <div className="overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             <p className="text-[13px] font-bold text-sidebar-foreground truncate">
               Admin User
             </p>
@@ -79,8 +82,62 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               Administrator
             </p>
           </div>
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            aria-label="Log out"
+            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors shrink-0"
+          >
+            <span className="material-symbols-outlined text-[20px]">logout</span>
+          </button>
         </div>
       </div>
+
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm"
+          onClick={() => setShowLogoutModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Logout confirmation"
+        >
+          <div
+            className="w-full max-w-sm bg-card rounded-3xl shadow-2xl border border-border overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center px-8 pt-8 pb-6 text-center">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-destructive text-3xl">
+                  logout
+                </span>
+              </div>
+              <h2 className="text-lg font-black text-foreground">
+                Do you want to log out?
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                You will be returned to the home page.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 border-t border-border">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="py-4 text-sm font-black text-muted-foreground hover:bg-muted transition-colors border-r border-border"
+              >
+                No
+              </button>
+              <button
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  router.push("/");
+                }}
+                className="py-4 text-sm font-black text-destructive hover:bg-destructive/5 transition-colors"
+              >
+                Yes, Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

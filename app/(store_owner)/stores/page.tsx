@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { StoreCard } from "./_components/StoreCard";
-import { MarketIntelligenceBanner } from "./_components/MarketIntelligenceBanner";
-import { Footer } from "@/app/components/landing/Footer";
+import { StoreCatalog } from "./_components/StoreCatalog";
 import type { ManagedStore } from "@/app/types/stores";
 
 export const metadata: Metadata = {
@@ -24,6 +22,9 @@ const mockStores: ManagedStore[] = [
     extraCreditCount: 12,
     stockLevelPercent: 88,
     stockLevelStatus: "optimal",
+    dailyTarget: 50000,
+    manager: "Maria Reyes",
+    monthlyGrowthPercent: 24.8,
   },
   {
     id: "store-002",
@@ -38,6 +39,9 @@ const mockStores: ManagedStore[] = [
     extraCreditCount: 4,
     stockLevelPercent: 42,
     stockLevelStatus: "low-stock",
+    dailyTarget: 30000,
+    manager: "Pedro Ong",
+    monthlyGrowthPercent: -3.2,
   },
   {
     id: "store-003",
@@ -53,48 +57,12 @@ const mockStores: ManagedStore[] = [
     extraCreditCount: 0,
     stockLevelPercent: 95,
     stockLevelStatus: "full",
+    dailyTarget: 20000,
+    manager: "Ana Reyes",
+    monthlyGrowthPercent: 11.5,
   },
 ];
 
-const activeCount = mockStores.filter((s) => s.status === "active").length;
-
-
 export default function StoresPage() {
-  return (
-    <div className="flex flex-col min-h-full">
-      <div className="flex-1 px-6 md:px-10 py-6 space-y-6">
-
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              Managed Stores
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              You are currently overseeing{" "}
-              <span className="text-primary font-bold">
-                {activeCount} active location{activeCount !== 1 ? "s" : ""}
-              </span>{" "}
-              across Metro Manila.
-            </p>
-          </div>
-          <button className="flex items-center gap-2 bg-primary text-primary-foreground text-xs font-bold px-5 py-2.5 rounded-xl hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 transition-all cursor-pointer whitespace-nowrap self-start">
-            <span className="material-symbols-outlined text-sm">add_business</span>
-            Add New Store
-          </button>
-        </div>
-
-        <section
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          aria-label="Store locations"
-        >
-          {mockStores.map((store) => (
-            <StoreCard key={store.id} store={store} />
-          ))}
-        </section>
-
-        <MarketIntelligenceBanner />
-
-      </div>
-    </div>
-  );
+  return <StoreCatalog initialStores={mockStores} />;
 }

@@ -21,20 +21,30 @@ interface InventoryCatalogProps {
 }
 
 export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
+  const [localItems, setLocalItems] = useState<InventoryItem[]>(items);
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<InventoryCategory | "All Categories">(
     "All Categories"
   );
   const [currentPage, setCurrentPage] = useState(1);
 
+  function handleUpdate(updated: InventoryItem) {
+    setLocalItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+  }
+
+  function handleDelete(id: string) {
+    setLocalItems((prev) => prev.filter((i) => i.id !== id));
+    setCurrentPage(1);
+  }
+
   const filtered = useMemo(() => {
-    return items.filter((item) => {
+    return localItems.filter((item) => {
       const matchesStatus = statusFilter === "all" || item.status === statusFilter;
       const matchesCategory =
         categoryFilter === "All Categories" || item.category === categoryFilter;
       return matchesStatus && matchesCategory;
     });
-  }, [items, statusFilter, categoryFilter]);
+  }, [localItems, statusFilter, categoryFilter]);
 
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -63,7 +73,11 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
       />
 
       <div className="bg-card rounded-3xl border border-border shadow overflow-hidden mb-12">
-        <InventoryTable items={paginated} />
+        <InventoryTable
+          items={paginated}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
         <Pagination
           currentPage={currentPage}
           totalItems={filtered.length}
