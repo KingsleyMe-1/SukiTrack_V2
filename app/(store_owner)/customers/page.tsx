@@ -1,78 +1,11 @@
 import type { Metadata } from "next";
 import { CustomerCatalog } from "./_components/CustomerCatalog";
-import { Footer } from "@/app/components/landing/Footer";
-import type { Customer } from "@/app/types/customers";
+import { mockCustomers, COLLECTION_RATE } from "@/app/data/customers";
 
 export const metadata: Metadata = {
   title: "Customers | SukiTrack",
   description: "Manage your suki accounts, credit balances, and repayment tracking.",
 };
-
-const mockCustomers: Customer[] = [
-  {
-    id: "cust-001",
-    name: "Maria Alcasid",
-    phone: "+63 917 123 4567",
-    creditStatus: "high-risk",
-    creditBalance: 12450,
-    lastPurchase: "Oct 12, 2023",
-    initials: "MA",
-    avatarColorClass: "bg-warning",
-  },
-  {
-    id: "cust-002",
-    name: "Ricardo Cruz",
-    phone: "+63 920 987 6543",
-    creditStatus: "stable",
-    creditBalance: 2100,
-    lastPurchase: "Today, 9:15 AM",
-    initials: "RC",
-    avatarColorClass: "bg-warning",
-  },
-  {
-    id: "cust-003",
-    name: "Elena Santos",
-    phone: "+63 915 555 0199",
-    creditStatus: "due-soon",
-    creditBalance: 8720,
-    lastPurchase: "Oct 24, 2023",
-    initials: "ES",
-    avatarColorClass: "bg-warning",
-  },
-  {
-    id: "cust-004",
-    name: "Juan Tan",
-    phone: "+63 928 333 4444",
-    creditStatus: "stable",
-    creditBalance: 450,
-    lastPurchase: "Yesterday",
-    initials: "JT",
-    avatarColorClass: "bg-warning",
-  },
-  {
-    id: "cust-005",
-    name: "Sarah Mercado",
-    phone: "+63 944 888 7766",
-    creditStatus: "new",
-    creditBalance: 0,
-    lastPurchase: "First Time",
-    initials: "SM",
-    avatarColorClass: "bg-warning",
-  },
-  {
-    id: "cust-006",
-    name: "Paul Ramos",
-    phone: "+63 918 000 1122",
-    creditStatus: "stable",
-    creditBalance: 1280,
-    lastPurchase: "Oct 26, 2023",
-    initials: "PR",
-    avatarColorClass: "bg-warning",
-  },
-];
-
-const COLLECTION_RATE = 92;
-
 
 export default function CustomersPage() {
   const activeCount = mockCustomers.length;
