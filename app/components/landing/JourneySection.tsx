@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import { useAuthModal } from "@/app/components/landing/AuthModalProvider";
 
 const journeyCards = [
   {
@@ -8,7 +10,7 @@ const journeyCards = [
       "Track your weekly spending across multiple stores, compare neighborhood prices in real-time, and manage your 'listahan' digitally with zero friction.",
     cta: "Get Started",
     dark: false,
-    link: "/customer",
+    action: "signup" as const,
   },
   {
     icon: "store",
@@ -17,11 +19,13 @@ const journeyCards = [
       "Digitize your inventory, notify regulars of new stock arrivals, and maintain professional digital ledgers for customer tabs with ease.",
     cta: "Register Store",
     dark: true,
-    link: "/dashboard",
+    action: "signup" as const,
   },
 ] as const;
 
 export function JourneySection() {
+  const { openSignUp } = useAuthModal();
+
   return (
     <section id="features" className="py-20 md:py-28 bg-secondary/50">
       <div className="max-w-7xl mx-auto px-6 md:px-8 mt-10">
@@ -36,10 +40,10 @@ export function JourneySection() {
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 max-w-5xl mx-auto">
           {journeyCards.map((card) => (
-            <Link
+            <button
               key={card.title}
-              href={card.link}
-              className={`p-10 md:p-12 rounded-[3rem] transition-all group cursor-pointer flex flex-col items-start ${
+              onClick={openSignUp}
+              className={`p-10 md:p-12 rounded-[3rem] transition-all group cursor-pointer flex flex-col items-start w-full text-left ${
                 card.dark
                   ? "bg-emphasis-surface border border-emphasis-accent/10 shadow-2xl shadow-black/20 hover:border-emphasis-accent/25 hover:shadow-primary/15"
                   : "bg-card shadow-sm hover:shadow-2xl hover:shadow-primary/5 border border-border hover:border-primary/30"
@@ -76,7 +80,7 @@ export function JourneySection() {
                 {card.cta}
                 <span className="material-symbols-outlined font-bold">arrow_forward</span>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       </div>

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ThemeToggleButton } from "@/app/components/ui/ThemeToggleButton";
-import { AuthModal } from "@/app/components/landing/AuthModal";
+import { useAuthModal } from "@/app/components/landing/AuthModalProvider";
 import Image from "next/image";
 
 function AuthModalController({
@@ -13,34 +13,35 @@ function AuthModalController({
   onAuthRequired: () => void;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     if (searchParams.get("auth_required") === "true") {
       onAuthRequired();
+      router.replace("/", { scroll: false });
     }
-  }, [searchParams, onAuthRequired]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }
 
 export function Navbar() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTab, setModalTab] = useState<"signin" | "signup">("signin");
+  const { openSignIn } = useAuthModal();
+
+  const handleAuthRequired = useCallback(() => {
+    openSignIn();
+  }, [openSignIn]);
 
   return (
     <>
       <Suspense fallback={null}>
-        <AuthModalController
-          onAuthRequired={() => {
-            setModalTab("signin");
-            setModalOpen(true);
-          }}
-        />
+        <AuthModalController onAuthRequired={handleAuthRequired} />
       </Suspense>
 
       <header className="w-full z-10 bg-background border-b border-border">
         <nav className="flex justify-between items-center px-6 md:px-8 py-4 max-w-7xl mx-auto">
-          
+
           <Link href="/" className="text-xl font-extrabold tracking-tight text-on-surface flex items-center">
             <Image src="/suki-track-logo.png" alt="SukiTrack Logo" height={40} width={40} className="rounded-lg mr-2" />
             Suki<span className="text-primary">Track</span>
@@ -51,12 +52,6 @@ export function Navbar() {
           </div>
         </nav>
       </header>
-
-      <AuthModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        defaultTab={modalTab}
-      />
     </>
   );
 }
