@@ -15,7 +15,7 @@ export function ThemeToggleButton({ className }: ThemeToggleButtonProps) {
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className={cn(
-        "p-2.5 rounded-full hover:bg-secondary text-foreground transition-all active:scale-90",
+        "p-2.5 rounded-full hover:bg-secondary text-foreground transition-all active:scale-90 cursor-pointer",
         className
       )}
     >

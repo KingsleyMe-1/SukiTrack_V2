@@ -47,7 +47,18 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-3">
-        {activities.map((activity) => {
+        {activities.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <span className="material-symbols-outlined text-4xl text-muted-foreground/40 mb-3">
+              inbox
+            </span>
+            <p className="text-sm font-semibold text-muted-foreground">No activity yet</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">
+              Transactions will appear here once recorded.
+            </p>
+          </div>
+        ) : (
+          activities.map((activity) => {
           const config = typeConfig[activity.type];
           return (
             <GlassCard
@@ -108,7 +119,8 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
               ) : null}
             </GlassCard>
           );
-        })}
+        })
+        )}
       </div>
     </section>
   );
