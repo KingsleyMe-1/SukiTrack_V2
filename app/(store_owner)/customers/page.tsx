@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CustomerCatalog } from "./_components/CustomerCatalog";
-import { mockCustomers, COLLECTION_RATE } from "@/app/data/customers";
+import { mockCustomers, COLLECTION_RATE } from "@/app/data/mock/customers";
 
 export const metadata: Metadata = {
   title: "Customers | SukiTrack",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { StoreCatalog } from "./_components/StoreCatalog";
-import { mockStores } from "@/app/data/stores";
+import { mockStores } from "@/app/data/mock/stores";
 
 export const metadata: Metadata = {
   title: "Managed Stores | SukiTrack",

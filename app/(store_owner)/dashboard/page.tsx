@@ -9,7 +9,7 @@ import {
   mockWeeklyBars,
   mockStockAlerts,
   mockActivities,
-} from "@/app/data/dashboard";
+} from "@/app/data/mock/dashboard";
 
 export const metadata: Metadata = {
   title: "Dashboard | SukiTrack",

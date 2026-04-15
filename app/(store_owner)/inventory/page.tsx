@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { InventoryCatalog } from "./_components/InventoryCatalog";
-import { mockInventoryItems, CATEGORIES, STORES } from "@/app/data/inventory";
+import { mockInventoryItems, CATEGORIES, STORES } from "@/app/data/mock/inventory";
 
 export const metadata: Metadata = {
   title: "Inventory Control | SukiTrack",
