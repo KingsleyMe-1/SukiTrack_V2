@@ -135,11 +135,15 @@ export function ProductDetailsModal({
 
   useEffect(() => {
     if (!item) return;
+    document.body.style.overflow = "hidden";
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handler);
+    };
   }, [item, onClose]);
 
   if (!item) return null;
@@ -169,8 +173,7 @@ export function ProductDetailsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/60 backdrop-blur-sm"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/95 backdrop-blur-xl"
       role="dialog"
       aria-modal="true"
       aria-label="Edit Product Details"

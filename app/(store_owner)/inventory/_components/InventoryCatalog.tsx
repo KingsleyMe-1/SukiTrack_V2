@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { InventoryItem, StockStatus, InventoryCategory } from "@/app/types/inventory";
+import type { InventoryItem, StockStatus, InventoryCategory, StoreOption } from "@/app/types/inventory";
 import { FilterBar } from "./FilterBar";
 import { InventoryTable } from "./InventoryTable";
 import { Pagination } from "./Pagination";
@@ -22,19 +22,23 @@ const STATUS_FILTERS: { label: string; value: StockStatus | "all" }[] = [
 interface InventoryCatalogProps {
   items: InventoryItem[];
   categories: InventoryCategory[];
+  stores: StoreOption[];
 }
 
-export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
+export function InventoryCatalog({ items, categories, stores }: InventoryCatalogProps) {
+  const activeStores = stores.filter((s) => s.status !== "ongoing-maintenance");
+
   const [localItems, setLocalItems] = useState<InventoryItem[]>(items);
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<InventoryCategory | "All Categories">(
     "All Categories"
   );
+  const [storeFilter, setStoreFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showAddItem, setShowAddItem] = useState(false);
-
   const [showBulkRestock, setShowBulkRestock] = useState(false);
+  const [productModalOpen, setProductModalOpen] = useState(false);
 
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -105,9 +109,10 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
       const matchesStatus = statusFilter === "all" || item.status === statusFilter;
       const matchesCategory =
         categoryFilter === "All Categories" || item.category === categoryFilter;
-      return matchesStatus && matchesCategory;
+      const matchesStore = storeFilter === "all" || item.storeId === storeFilter;
+      return matchesStatus && matchesCategory && matchesStore;
     });
-  }, [localItems, statusFilter, categoryFilter]);
+  }, [localItems, statusFilter, categoryFilter, storeFilter]);
 
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -142,12 +147,19 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
     setCurrentPage(1);
   }
 
+  function handleStoreChange(storeId: string) {
+    setStoreFilter(storeId);
+    setCurrentPage(1);
+  }
+
   return (
     <>
       <AddItemModal
         open={showAddItem}
         onClose={() => setShowAddItem(false)}
         onAdd={handleAdd}
+        stores={activeStores}
+        defaultStoreId={storeFilter !== "all" ? storeFilter : undefined}
       />
 
       <BulkRestockModal
@@ -158,6 +170,8 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
           handleBulkRestockConfirm(entries);
           setShowBulkRestock(false);
         }}
+        stores={activeStores}
+        defaultStoreId={storeFilter !== "all" ? storeFilter : undefined}
       />
 
       <Header
@@ -176,6 +190,9 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
           categories={categories}
           selectedCategory={categoryFilter}
           onCategoryChange={handleCategoryChange}
+          stores={activeStores}
+          selectedStoreId={storeFilter}
+          onStoreChange={handleStoreChange}
         />
 
         <div className="bg-card rounded-3xl border border-border shadow overflow-hidden mb-12">
@@ -187,6 +204,8 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
             onSelectAll={handleSelectAll}
+            onProductModalOpen={() => setProductModalOpen(true)}
+            onProductModalClose={() => setProductModalOpen(false)}
           />
           <Pagination
             currentPage={currentPage}
@@ -197,7 +216,9 @@ export function InventoryCatalog({ items, categories }: InventoryCatalogProps) {
         </div>
       </div>
 
-      <FloatingActionButton onClick={() => setShowAddItem(true)} />
+      {!showAddItem && !showBulkRestock && !productModalOpen && (
+        <FloatingActionButton onClick={() => setShowAddItem(true)} />
+      )}
     </>
   );
 }

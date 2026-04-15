@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import type { InventoryItem } from "@/app/types/inventory";
+import type { InventoryItem, StoreOption } from "@/app/types/inventory";
 import { cn } from "@/app/utils/cn";
+import { SelectDropdown } from "@/app/components/ui/SelectDropdown";
 
 interface RestockEntry {
   item: InventoryItem;
@@ -16,6 +17,8 @@ interface BulkRestockModalProps {
   allItems: InventoryItem[];
   onClose: () => void;
   onConfirm: (restocked: RestockEntry[]) => void;
+  stores: StoreOption[];
+  defaultStoreId?: string;
 }
 
 const inputClass =
@@ -30,10 +33,13 @@ export function BulkRestockModal({
   allItems,
   onClose,
   onConfirm,
+  stores,
+  defaultStoreId,
 }: BulkRestockModalProps) {
   const [search, setSearch] = useState("");
   const [restockList, setRestockList] = useState<RestockEntry[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>(defaultStoreId ?? "all");
 
   const suggestions = useMemo(() => {
     if (!search.trim()) return [];
@@ -43,11 +49,12 @@ export function BulkRestockModal({
       .filter(
         (item) =>
           !inList.has(item.id) &&
+          (selectedStoreId === "all" || item.storeId === selectedStoreId) &&
           (item.name.toLowerCase().includes(q) ||
             toSku(item.id).toLowerCase().includes(q))
       )
       .slice(0, 6);
-  }, [search, allItems, restockList]);
+  }, [search, allItems, restockList, selectedStoreId]);
 
   function addItem(item: InventoryItem) {
     setRestockList((prev) => [...prev, { item, quantity: 1, newCost: "" }]);
@@ -76,26 +83,37 @@ export function BulkRestockModal({
   }
 
   const totalVolume = restockList.reduce((sum, r) => sum + r.quantity, 0);
+  const storeOptions = [
+    { value: "all", label: "All Stores" },
+    ...stores.map((s) => ({ value: s.id, label: s.name })),
+  ];
 
   function handleConfirm() {
     onConfirm(restockList);
     setRestockList([]);
     setSearch("");
+    setSelectedStoreId(defaultStoreId ?? "all");
     onClose();
   }
 
   function handleClose() {
     setRestockList([]);
     setSearch("");
+    setSelectedStoreId(defaultStoreId ?? "all");
     onClose();
   }
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/60 backdrop-blur-sm"
-      onClick={handleClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/95 backdrop-blur-xl"
       role="dialog"
       aria-modal="true"
       aria-label="Bulk Restock Inventory"
@@ -123,6 +141,23 @@ export function BulkRestockModal({
         </div>
 
         <div className="flex-1 overflow-y-auto px-7 py-6 space-y-6">
+
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground mb-2">
+              Filter by Store
+            </p>
+            <SelectDropdown
+              variant="field"
+              triggerIcon="storefront"
+              options={storeOptions}
+              value={selectedStoreId}
+              onChange={(v) => {
+                setSelectedStoreId(v);
+                setRestockList([]);
+                setSearch("");
+              }}
+            />
+          </div>
 
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground mb-2">

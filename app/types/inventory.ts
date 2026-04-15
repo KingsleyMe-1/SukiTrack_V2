@@ -10,6 +10,12 @@ export type InventoryCategory =
   | "Quick Meals"
   | "Household";
 
+export interface StoreOption {
+  id: string;
+  name: string;
+  status: "active" | "ongoing-maintenance" | "closed";
+}
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -21,4 +27,5 @@ export interface InventoryItem {
   lastRestock: string;
   lastUpdated?: string;
   imageUrl?: string;
+  storeId?: string;
 }

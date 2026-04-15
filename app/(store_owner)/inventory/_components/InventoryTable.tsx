@@ -175,6 +175,8 @@ interface InventoryTableProps {
   selectedIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
   onSelectAll?: () => void;
+  onProductModalOpen?: () => void;
+  onProductModalClose?: () => void;
 }
 
 export function InventoryTable({
@@ -185,6 +187,8 @@ export function InventoryTable({
   selectedIds = new Set(),
   onToggleSelect,
   onSelectAll,
+  onProductModalOpen,
+  onProductModalClose,
 }: InventoryTableProps) {
   const [modal, setModal] = useState<ModalType>(null);
   const allSelected = items.length > 0 && items.every((i) => selectedIds.has(i.id));
@@ -195,6 +199,7 @@ export function InventoryTable({
       onToggleSelect?.(item.id);
     } else {
       setModal(item);
+      onProductModalOpen?.();
     }
   }
 
@@ -202,7 +207,7 @@ export function InventoryTable({
     <>
       <ProductDetailsModal
         item={modal}
-        onClose={() => setModal(null)}
+        onClose={() => { setModal(null); onProductModalClose?.(); }}
         onUpdate={onUpdate}
         onDelete={onDelete}
       />
@@ -240,6 +245,7 @@ export function InventoryTable({
             )}
           </div>
         )}
+
         {items.map((item, i) => (
           <MobileItemCard
             key={item.id}
