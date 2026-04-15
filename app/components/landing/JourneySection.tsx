@@ -8,9 +8,10 @@ const journeyCards = [
     title: "I'm a Customer",
     description:
       "Track your weekly spending across multiple stores, compare neighborhood prices in real-time, and manage your 'listahan' digitally with zero friction.",
-    cta: "Get Started",
+    cta: "Coming Soon",
     dark: false,
     action: "signup" as const,
+    disabled: true,
   },
   {
     icon: "store",
@@ -20,6 +21,7 @@ const journeyCards = [
     cta: "Register Store",
     dark: true,
     action: "signup" as const,
+    disabled: false,
   },
 ] as const;
 
@@ -42,18 +44,25 @@ export function JourneySection() {
           {journeyCards.map((card) => (
             <button
               key={card.title}
-              onClick={openSignUp}
-              className={`p-10 md:p-12 rounded-[3rem] transition-all group cursor-pointer flex flex-col items-start w-full text-left ${
+              onClick={card.disabled ? undefined : openSignUp}
+              disabled={card.disabled}
+              className={`p-10 md:p-12 rounded-[3rem] transition-all group flex flex-col items-start w-full text-left ${
+                card.disabled
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              } ${
                 card.dark
-                  ? "bg-emphasis-surface border border-emphasis-accent/10 shadow-2xl shadow-black/20 hover:border-emphasis-accent/25 hover:shadow-primary/15"
-                  : "bg-card shadow-sm hover:shadow-2xl hover:shadow-primary/5 border border-border hover:border-primary/30"
+                  ? `bg-emphasis-surface border border-emphasis-accent/10 shadow-2xl shadow-black/20 ${!card.disabled ? "hover:border-emphasis-accent/25 hover:shadow-primary/15" : ""}`
+                  : `bg-card shadow-sm border border-border ${!card.disabled ? "hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/30" : ""}`
               }`}
             >
               <div
-                className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-8 md:mb-10 shadow-sm group-hover:scale-110 transition-all duration-500 ${
+                className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-8 md:mb-10 shadow-sm transition-all duration-500 ${
+                  !card.disabled ? "group-hover:scale-110" : ""
+                } ${
                   card.dark
-                    ? "bg-emphasis-accent/10 text-emphasis-accent group-hover:bg-emphasis-accent/15"
-                    : "bg-secondary text-primary group-hover:bg-primary/8"
+                    ? `bg-emphasis-accent/10 text-emphasis-accent ${!card.disabled ? "group-hover:bg-emphasis-accent/15" : ""}`
+                    : `bg-secondary text-primary ${!card.disabled ? "group-hover:bg-primary/8" : ""}`
                 }`}
               >
                 <span className="material-symbols-outlined text-2xl md:text-3xl font-light">{card.icon}</span>
@@ -73,12 +82,20 @@ export function JourneySection() {
                 {card.description}
               </p>
               <div
-                className={`flex items-center font-bold gap-3 text-sm md:text-base mt-auto group-hover:gap-5 transition-all ${
-                  card.dark ? "text-emphasis-accent" : "text-primary"
+                className={`flex items-center font-bold gap-3 text-sm md:text-base mt-auto transition-all ${
+                  card.disabled
+                    ? "text-muted-foreground"
+                    : card.dark
+                    ? "text-emphasis-accent group-hover:gap-5"
+                    : "text-primary group-hover:gap-5"
                 }`}
               >
                 {card.cta}
-                <span className="material-symbols-outlined font-bold">arrow_forward</span>
+                {card.disabled ? (
+                  <span className="material-symbols-outlined font-bold">lock</span>
+                ) : (
+                  <span className="material-symbols-outlined font-bold">arrow_forward</span>
+                )}
               </div>
             </button>
           ))}
