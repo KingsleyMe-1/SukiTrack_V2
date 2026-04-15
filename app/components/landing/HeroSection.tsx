@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { GlassCard } from "@/app/components/ui/GlassCard";
+import { VideoModal } from "@/app/components/landing/VideoModal";
 
 const floatingBadges = [
   {
@@ -38,7 +39,10 @@ const floatingBadges = [
 ];
 
 export function HeroSection() {
+  const [demoOpen, setDemoOpen] = useState(false);
+
   return (
+    <>
     <section className="relative px-6 md:px-8 py-14 md:py-24 max-w-7xl mx-auto overflow-visible">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         <div className="lg:col-span-6 space-y-6 animate-fade-in-up">
@@ -64,9 +68,13 @@ export function HeroSection() {
             >
               Get Started
             </button>
-            <Link href="/demo" className="px-7 py-3.5 rounded-full font-semibold text-sm md:text-base text-foreground border border-border hover:bg-secondary transition-all active:scale-95">
+            <button
+              onClick={() => setDemoOpen(true)}
+              className="flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm md:text-base text-foreground border border-border hover:bg-secondary transition-all active:scale-95 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-base">play_circle</span>
               Watch Demo
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -125,5 +133,12 @@ export function HeroSection() {
         </div>
       </div>
     </section>
+
+      <VideoModal
+        isOpen={demoOpen}
+        onClose={() => setDemoOpen(false)}
+        src="/Demo_SukiTrack.mp4"
+      />
+    </>
   );
 }
