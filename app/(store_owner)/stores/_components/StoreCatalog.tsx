@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { ManagedStore } from "@/app/types/stores";
 import { StoreCard } from "./StoreCard";
 import { StoreDetailsModal } from "./StoreDetailsModal";
+import { AddStoreModal } from "./AddStoreModal";
 import { MarketIntelligenceBanner } from "./MarketIntelligenceBanner";
 
 const STORAGE_KEY = "sukitrack_stores";
@@ -15,6 +16,7 @@ interface StoreCatalogProps {
 export function StoreCatalog({ initialStores }: StoreCatalogProps) {
   const [stores, setStores] = useState<ManagedStore[]>(initialStores);
   const [selectedStore, setSelectedStore] = useState<ManagedStore | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -40,6 +42,10 @@ export function StoreCatalog({ initialStores }: StoreCatalogProps) {
     }
   }, [stores, hydrated]);
 
+  function handleAdd(newStore: ManagedStore) {
+    setStores((prev) => [...prev, newStore]);
+  }
+
   function handleUpdate(updated: ManagedStore) {
     setStores((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   }
@@ -58,6 +64,11 @@ export function StoreCatalog({ initialStores }: StoreCatalogProps) {
         onUpdate={handleUpdate}
         onRemove={handleRemove}
       />
+      <AddStoreModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onAdd={handleAdd}
+      />
 
       <div className="flex flex-col min-h-full">
         <div className="flex-1 px-6 md:px-10 py-6 space-y-6">
@@ -74,7 +85,10 @@ export function StoreCatalog({ initialStores }: StoreCatalogProps) {
                 across Metro Manila.
               </p>
             </div>
-            <button className="flex items-center gap-2 bg-primary text-primary-foreground text-xs font-bold px-5 py-2.5 rounded-xl hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 transition-all cursor-pointer whitespace-nowrap self-start">
+            <button
+              onClick={() => setAddOpen(true)}
+              className="flex items-center gap-2 bg-primary text-primary-foreground text-xs font-bold px-5 py-2.5 rounded-xl hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 transition-all cursor-pointer whitespace-nowrap self-start"
+            >
               <span className="material-symbols-outlined text-sm">add_business</span>
               Add New Store
             </button>
