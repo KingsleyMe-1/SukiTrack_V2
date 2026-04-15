@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { cn } from "@/app/utils/cn";
 import Image from "next/image";
+import { createClient } from "@/app/utils/supabase/client";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
@@ -16,12 +18,26 @@ const navItems = [
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  user: User;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const displayName =
+    (user.user_metadata?.full_name as string | undefined)?.split(" ")[0] ??
+    user.email?.split("@")[0] ??
+    "Owner";
+  const displayEmail = user.email ?? "";
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <aside
@@ -69,17 +85,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <div className="px-6 mt-auto">
         <div className="p-4 bg-sidebar-accent rounded-2xl flex items-center space-x-3 border border-sidebar-border shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-muted border-2 border-sidebar shadow-sm flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-muted-foreground text-xl">
-              person
-            </span>
+          <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-sidebar shadow-sm flex items-center justify-center shrink-0 text-primary font-bold text-sm">
+            {displayName[0]?.toUpperCase()}
           </div>
           <div className="flex-1 overflow-hidden">
             <p className="text-[13px] font-bold text-sidebar-foreground truncate">
-              Admin User
+              {displayName}
             </p>
-            <p className="text-[11px] text-muted-foreground opacity-70">
-              Administrator
+            <p className="text-[11px] text-muted-foreground opacity-70 truncate">
+              {displayEmail}
             </p>
           </div>
           <button
@@ -128,7 +142,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 onClick={() => {
                   setShowLogoutModal(false);
-                  router.push("/");
+                  handleSignOut();
                 }}
                 className="py-4 text-sm font-black text-destructive hover:bg-destructive/5 transition-colors"
               >

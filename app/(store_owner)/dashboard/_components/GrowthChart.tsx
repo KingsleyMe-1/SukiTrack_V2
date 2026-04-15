@@ -46,6 +46,13 @@ export function GrowthChart({ bars }: GrowthChartProps) {
         </div>
       </div>
 
+      {bars.every((b) => !b.value) && (
+        <div className="flex flex-col items-center justify-center gap-2 py-4 mb-4 rounded-2xl bg-muted/40 border border-dashed border-border">
+          <span className="material-symbols-outlined text-muted-foreground/40 text-3xl">bar_chart</span>
+          <p className="text-xs font-semibold text-muted-foreground/60">No sales data yet this week</p>
+        </div>
+      )}
+
       <div className="h-48 sm:h-56 md:h-64 flex gap-2 sm:gap-4 px-2">
         {bars.map((bar, i) => (
           <div

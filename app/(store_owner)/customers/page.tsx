@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
+import { createClient } from "@/app/utils/supabase/server";
+import { getCustomers } from "@/app/data/supabase/customers";
 import { CustomerCatalog } from "./_components/CustomerCatalog";
-import { mockCustomers, COLLECTION_RATE } from "@/app/data/mock/customers";
 
 export const metadata: Metadata = {
   title: "Customers | SukiTrack",
   description: "Manage your suki accounts, credit balances, and repayment tracking.",
 };
 
-export default function CustomersPage() {
-  const activeCount = mockCustomers.length;
+export default async function CustomersPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const customers = await getCustomers(user!.id);
+
+  const nonHighRisk = customers.filter((c) => c.creditStatus !== "high-risk").length;
+  const collectionRate =
+    customers.length > 0 ? Math.round((nonHighRisk / customers.length) * 100) : 0;
 
   return (
     <div className="flex flex-col min-h-full">
@@ -21,11 +28,11 @@ export default function CustomersPage() {
             </h2>
             <div className="flex items-center gap-3 mt-2 flex-wrap">
               <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                {activeCount} Active Sukis
+                {customers.length} Active Sukis
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-                Updated 5 minutes ago
+                Live from database
               </span>
             </div>
           </div>
@@ -36,8 +43,8 @@ export default function CustomersPage() {
         </div>
 
         <CustomerCatalog
-          customers={mockCustomers}
-          collectionRate={COLLECTION_RATE}
+          customers={customers}
+          collectionRate={collectionRate}
         />
 
       </div>

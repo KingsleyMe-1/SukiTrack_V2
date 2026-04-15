@@ -1,59 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { ManagedStore } from "@/app/types/stores";
 import { StoreCard } from "./StoreCard";
 import { StoreDetailsModal } from "./StoreDetailsModal";
 import { AddStoreModal } from "./AddStoreModal";
 import { MarketIntelligenceBanner } from "./MarketIntelligenceBanner";
-
-const STORAGE_KEY = "sukitrack_stores";
+import {
+  createStoreAction,
+  updateStoreAction,
+  deleteStoreAction,
+} from "../actions";
 
 interface StoreCatalogProps {
   initialStores: ManagedStore[];
 }
 
 export function StoreCatalog({ initialStores }: StoreCatalogProps) {
-  const [stores, setStores] = useState<ManagedStore[]>(initialStores);
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [selectedStore, setSelectedStore] = useState<ManagedStore | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed: ManagedStore[] = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setStores(parsed);
-        }
-      }
-    } catch {
-    } finally {
-      setHydrated(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stores));
-    } catch {
-    }
-  }, [stores, hydrated]);
-
-  function handleAdd(newStore: ManagedStore) {
-    setStores((prev) => [...prev, newStore]);
+  async function handleAdd(newStore: ManagedStore) {
+    await createStoreAction({
+      name: newStore.name,
+      location: newStore.location,
+      dailyTarget: newStore.dailyTarget,
+      manager: newStore.manager,
+    });
+    startTransition(() => router.refresh());
   }
 
-  function handleUpdate(updated: ManagedStore) {
-    setStores((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+  async function handleUpdate(updated: ManagedStore) {
+    await updateStoreAction(updated.id, {
+      name: updated.name,
+      location: updated.location,
+      dailyTarget: updated.dailyTarget,
+      manager: updated.manager,
+    });
+    startTransition(() => router.refresh());
   }
 
-  function handleRemove(id: string) {
-    setStores((prev) => prev.filter((s) => s.id !== id));
+  async function handleRemove(id: string) {
+    await deleteStoreAction(id);
+    startTransition(() => router.refresh());
   }
 
+  const stores = initialStores;
   const activeCount = stores.filter((s) => s.status === "active").length;
 
   return (
@@ -98,13 +93,21 @@ export function StoreCatalog({ initialStores }: StoreCatalogProps) {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             aria-label="Store locations"
           >
-            {stores.map((store) => (
-              <StoreCard
-                key={store.id}
-                store={store}
-                onManage={() => setSelectedStore(store)}
-              />
-            ))}
+            {stores.length === 0 ? (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 text-center gap-3">
+                <span className="material-symbols-outlined text-5xl text-muted-foreground/40">storefront</span>
+                <p className="text-sm font-semibold text-muted-foreground">No stores yet</p>
+                <p className="text-xs text-muted-foreground/60">Add your first store location to start tracking performance.</p>
+              </div>
+            ) : (
+              stores.map((store) => (
+                <StoreCard
+                  key={store.id}
+                  store={store}
+                  onManage={() => setSelectedStore(store)}
+                />
+              ))
+            )}
           </section>
 
           <MarketIntelligenceBanner />
