@@ -6,7 +6,7 @@ import type { ManagedStore, StoreStatus } from "@/app/types/stores";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type NewStore = Omit<ManagedStore, "creditAccounts" | "extraCreditCount"> & { ownerId: string };
+type NewStore = Omit<ManagedStore, "id" | "creditAccounts" | "extraCreditCount"> & { ownerId: string };
 type StoreUpdate = Partial<Omit<ManagedStore, "id" | "creditAccounts" | "ownerId">>;
 
 function mapStore(

@@ -21,8 +21,6 @@ export async function createStoreAction(input: CreateStoreInput): Promise<Manage
     status: "active",
     icon: "storefront",
     todaysSales: 0,
-    creditAccounts: [],
-    extraCreditCount: 0,
     stockLevelPercent: 0,
     stockLevelStatus: "optimal",
     dailyTarget: input.dailyTarget,
