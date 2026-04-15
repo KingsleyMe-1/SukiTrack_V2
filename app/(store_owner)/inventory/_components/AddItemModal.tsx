@@ -1,5 +1,6 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import type { InventoryItem, InventoryCategory, StockStatus } from "@/app/types/inventory";
 import { cn } from "@/app/utils/cn";
 
@@ -13,23 +14,6 @@ const EDITABLE_CATEGORIES: Exclude<InventoryCategory, "All Categories">[] = [
   "Household",
 ];
 
-const LOW_STOCK_THRESHOLD = 20;
-
-interface FormState {
-  name: string;
-  category: Exclude<InventoryCategory, "All Categories">;
-  stockCount: number;
-  cost: number;
-  price: number;
-}
-
-interface ProductDetailsModalProps {
-  item: InventoryItem | null;
-  onClose: () => void;
-  onUpdate?: (updated: InventoryItem) => void;
-  onDelete?: (id: string) => void;
-}
-
 const CATEGORY_ICONS: Record<string, string> = {
   "Grains & Rice": "grocery",
   "Canned Goods": "inventory_2",
@@ -40,49 +24,15 @@ const CATEGORY_ICONS: Record<string, string> = {
   "Household": "cleaning_services",
 };
 
-function deriveStatus(stockCount: number): StockStatus {
-  if (stockCount === 0) return "out-of-stock";
-  if (stockCount < LOW_STOCK_THRESHOLD) return "low-stock";
+const LOW_STOCK_THRESHOLD = 20;
+
+const inputClass =
+  "w-full px-4 py-2.5 rounded-xl border border-border bg-accent/30 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow";
+
+function deriveStatus(count: number): StockStatus {
+  if (count === 0) return "out-of-stock";
+  if (count < LOW_STOCK_THRESHOLD) return "low-stock";
   return "healthy";
-}
-
-function ProductPlaceholder({ item }: { item: InventoryItem }) {
-  const icon = CATEGORY_ICONS[item.category] ?? "inventory_2";
-
-  if (item.imageUrl) {
-    return (
-      <Image
-        src={item.imageUrl}
-        alt={item.name}
-        width={160}
-        height={160}
-        className="w-40 h-40 object-contain drop-shadow-2xl rounded-2xl"
-      />
-    );
-  }
-
-  return (
-    <div className="relative w-44 h-44 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.10] via-white/[0.04] to-transparent" />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 opacity-[0.12]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, white 1px, transparent 1px)",
-          backgroundSize: "14px 14px",
-        }}
-      />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-        <span className="material-symbols-outlined text-white/50 text-[64px] leading-none">
-          {icon}
-        </span>
-        <span className="text-[9px] font-black uppercase tracking-[0.24em] text-white/25 px-3 py-1 rounded-full border border-white/10 bg-white/5">
-          {item.category}
-        </span>
-      </div>
-    </div>
-  );
 }
 
 function InputField({
@@ -102,78 +52,78 @@ function InputField({
   );
 }
 
-const inputClass =
-  "w-full px-4 py-2.5 rounded-xl border border-border bg-accent/30 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow";
+interface FormState {
+  name: string;
+  category: Exclude<InventoryCategory, "All Categories">;
+  stockCount: number;
+  cost: number;
+  price: number;
+}
 
-export function ProductDetailsModal({
-  item,
-  onClose,
-  onUpdate,
-  onDelete,
-}: ProductDetailsModalProps) {
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    category: "Grains & Rice",
-    stockCount: 0,
-    cost: 0,
-    price: 0,
-  });
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [syncedItemId, setSyncedItemId] = useState<string | null>(null);
+const DEFAULT_FORM: FormState = {
+  name: "",
+  category: "Grains & Rice",
+  stockCount: 0,
+  cost: 0,
+  price: 0,
+};
 
-  if (item && item.id !== syncedItemId) {
-    setSyncedItemId(item.id);
-    setForm({
-      name: item.name,
-      category: item.category as Exclude<InventoryCategory, "All Categories">,
-      stockCount: item.stockCount,
-      cost: item.cost,
-      price: item.price,
-    });
-    setConfirmDelete(false);
-  }
+export interface AddItemModalProps {
+  open: boolean;
+  onClose: () => void;
+  onAdd: (item: InventoryItem) => void;
+}
 
-  useEffect(() => {
-    if (!item) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [item, onClose]);
-
-  if (!item) return null;
-
-  const isOutOfStock = form.stockCount === 0;
-  const isCriticalLow =
-    form.stockCount > 0 && form.stockCount < LOW_STOCK_THRESHOLD;
-  const showWarning = isOutOfStock || isCriticalLow;
-
-
-  function handleUpdate() {
-    if (!item) return;
-    onUpdate?.({
-      ...item,
-      ...form,
-      status: deriveStatus(form.stockCount),
-      lastUpdated: new Date().toISOString(),
-    });
+export function AddItemModal({ open, onClose, onAdd }: AddItemModalProps) {
+  const [form, setForm] = useState<FormState>({ ...DEFAULT_FORM });
+  function handleClose() {
+    setForm({ ...DEFAULT_FORM });
     onClose();
   }
 
-  function handleDelete() {
-    if (!item) return;
-    onDelete?.(item.id);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open]);
+
+  if (!open) return null;
+
+  const icon = CATEGORY_ICONS[form.category] ?? "inventory_2";
+  const isOutOfStock = form.stockCount === 0;
+  const isCriticalLow = form.stockCount > 0 && form.stockCount < LOW_STOCK_THRESHOLD;
+  const showWarning = isOutOfStock || isCriticalLow;
+  const canSubmit = form.name.trim() !== "";
+
+  
+
+  function handleAdd() {
+    if (!canSubmit) return;
+    const today = new Date().toISOString().split("T")[0];
+    onAdd({
+      id: `inv-${Date.now()}`,
+      name: form.name.trim(),
+      category: form.category,
+      status: deriveStatus(form.stockCount),
+      stockCount: form.stockCount,
+      cost: form.cost,
+      price: form.price,
+      lastRestock: today,
+    });
+    setForm({ ...DEFAULT_FORM });
     onClose();
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/60 backdrop-blur-sm"
-      onClick={onClose}
+      onClick={handleClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Edit Product Details"
+      aria-label="Add New Item"
     >
       <div
         className="relative w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex"
@@ -183,22 +133,26 @@ export function ProductDetailsModal({
           className="hidden sm:flex sm:w-2/5 flex-col p-8 relative overflow-hidden"
           style={{ backgroundColor: "var(--foreground)" }}
         >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-          >
-            <span className="text-[6rem] font-black italic text-white/[0.04] whitespace-nowrap -rotate-12 tracking-tight leading-none">
-              {item.name}
-            </span>
-          </div>
-
           <div className="flex-1 flex items-center justify-center z-10 py-4">
-            <ProductPlaceholder item={item} />
+            <div className="relative w-44 h-44 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.10] via-white/[0.04] to-transparent" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <span className="material-symbols-outlined text-white/50 text-[64px] leading-none">
+                  {icon}
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-[0.24em] text-white/25 px-3 py-1 rounded-full border border-white/10 bg-white/5">
+                  {form.category}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="z-10">
-            <p className="text-xl font-black text-white leading-snug">
-              {item.name}
+            <p className="text-xl font-black text-white leading-snug line-clamp-2">
+              {form.name || "New Product"}
+            </p>
+            <p className="text-xs text-white/40 mt-0.5 font-medium">
+              Adding to inventory
             </p>
           </div>
         </div>
@@ -207,14 +161,14 @@ export function ProductDetailsModal({
           <div className="flex items-start justify-between px-7 pt-7 pb-5 border-b border-border">
             <div>
               <h2 className="text-base font-black text-foreground">
-                Edit Product Details
+                Add New Item
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Update stock levels, pricing, or category.
+                Fill in the details to add a product to inventory.
               </p>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
               aria-label="Close dialog"
             >
@@ -228,9 +182,13 @@ export function ProductDetailsModal({
             <InputField label="Product Name">
               <input
                 type="text"
+                placeholder="e.g. Jasmine Rice 5kg"
                 value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, name: e.target.value }))
+                }
                 className={inputClass}
+                autoFocus
               />
             </InputField>
 
@@ -340,7 +298,7 @@ export function ProductDetailsModal({
                       isOutOfStock ? "text-destructive" : "text-warning"
                     )}
                   >
-                    {isOutOfStock ? "Out of Stock" : "Critical Low Stock"}
+                    {isOutOfStock ? "No Stock Set" : "Low Stock Warning"}
                   </p>
                   <p
                     className={cn(
@@ -351,8 +309,8 @@ export function ProductDetailsModal({
                     )}
                   >
                     {isOutOfStock
-                      ? "This item has no remaining units."
-                      : "This item is below the safety stock threshold."}
+                      ? "This product will be listed as out of stock."
+                      : "Stock is below the safety threshold."}
                   </p>
                 </div>
               </div>
@@ -360,46 +318,29 @@ export function ProductDetailsModal({
           </div>
 
           <div className="px-7 py-5 border-t border-border">
-            {confirmDelete ? (
-              <div className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-black text-foreground">Remove this product?</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    This action cannot be undone.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  className="px-4 py-2.5 rounded-xl border border-border text-xs font-black text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-black hover:scale-[1.02] active:scale-95 transition-all shrink-0"
-                >
-                  <span className="material-symbols-outlined text-[14px]">delete</span>
-                  Yes, Delete
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleUpdate}
-                  className="flex-1 bg-primary text-primary-foreground text-sm font-black py-3 rounded-xl shadow-sm shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
-                >
-                  Update Product
-                </button>
-                <button
-                  onClick={() => setConfirmDelete(true)}
-                  className="flex gap-2 items-center bg-destructive text-destructive-foreground text-sm font-black py-2.5 px-5 rounded-xl shadow-sm shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
-                  aria-label="Delete product"
-                >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                  Delete
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleClose}
+                className="px-5 py-2.5 rounded-xl border border-border text-xs font-black text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAdd}
+                disabled={!canSubmit}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 text-sm font-black py-3 rounded-xl transition-all",
+                  canSubmit
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20 hover:scale-[1.02] active:scale-95 cursor-pointer"
+                    : "bg-primary/30 text-primary-foreground/50 cursor-not-allowed"
+                )}
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  add_circle
+                </span>
+                Add to Inventory
+              </button>
+            </div>
           </div>
         </div>
       </div>

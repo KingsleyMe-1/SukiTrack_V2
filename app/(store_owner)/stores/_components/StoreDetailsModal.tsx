@@ -174,7 +174,7 @@ export function StoreDetailsModal({
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0 cursor-pointer"
                 aria-label="Close dialog"
               >
                 <span className="material-symbols-outlined text-[16px]">close</span>
@@ -263,11 +263,11 @@ export function StoreDetailsModal({
               <div className="flex items-center justify-between gap-4">
                 <button
                   onClick={() => setConfirmRemove(true)}
-                  className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-destructive hover:text-destructive/70 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 bg-destructive text-destructive-foreground text-sm font-black px-5 py-2.5 rounded-xl shadow-sm shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
                   aria-label="Remove store"
                 >
                   <span className="material-symbols-outlined text-[16px]">delete</span>
-                  Remove
+                  Remove Store
                 </button>
                 <button
                   onClick={handleUpdate}

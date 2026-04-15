@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 
-export function FloatingActionButton() {
+interface FloatingActionButtonProps {
+  onClick: () => void;
+}
+
+export function FloatingActionButton({ onClick }: FloatingActionButtonProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <button
-      aria-label="Quick Add Entry"
+      aria-label="Add new item"
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="fixed bottom-6 right-6 md:bottom-10 md:right-10 editorial-gradient text-on-primary w-14 h-14 md:w-16 md:h-16 rounded-2xl shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 cursor-pointer"
@@ -21,7 +26,7 @@ export function FloatingActionButton() {
         aria-hidden="true"
       >
         <div className="bg-accent text-foreground border border-border text-[11px] font-bold px-4 py-2 rounded-xl shadow-xl whitespace-nowrap">
-          Quick Add Entry
+          Add new item
         </div>
       </div>
     </button>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./DashboardHeader";
-import { FloatingActionButton } from "./FloatingActionButton";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,8 +23,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <DashboardHeader onMenuToggle={() => setSidebarOpen((v) => !v)} />
         <main className="flex-1">{children}</main>
       </div>
-
-      <FloatingActionButton />
     </div>
   );
 }

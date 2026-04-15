@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Header from "./_components/Header";
 import { InventoryCatalog } from "./_components/InventoryCatalog";
 import type { InventoryItem, InventoryCategory } from "@/app/types/inventory";
-import { Footer } from "@/app/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Inventory Control | SukiTrack",
@@ -148,7 +146,6 @@ export default function InventoryPage() {
   return (
     <div className="flex flex-col min-h-full">
       <div className="flex-1 px-6 md:px-10 py-6 space-y-6">
-        <Header />
         <InventoryCatalog items={mockItems} categories={CATEGORIES} />
       </div>
     </div>

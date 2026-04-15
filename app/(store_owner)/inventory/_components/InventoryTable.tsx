@@ -76,23 +76,50 @@ function ProductIcon({ item }: { item: InventoryItem }) {
 function MobileItemCard({
   item,
   index,
+  deleteMode,
+  selected,
   onClick,
 }: {
   item: InventoryItem;
   index: number;
+  deleteMode?: boolean;
+  selected?: boolean;
   onClick: () => void;
 }) {
   const isOutOfStock = item.status === "out-of-stock";
   return (
     <div
       className={cn(
-        "px-4 py-4 cursor-pointer transition-colors hover:bg-primary/5",
-        isOutOfStock && "opacity-70",
-        index % 2 === 0 ? "bg-card" : "bg-background/40"
+        "px-4 py-4 cursor-pointer transition-colors",
+        deleteMode
+          ? selected
+            ? "bg-destructive/8"
+            : index % 2 === 0
+            ? "bg-card hover:bg-destructive/5"
+            : "bg-background/40 hover:bg-destructive/5"
+          : cn(
+              "hover:bg-primary/5",
+              isOutOfStock && "opacity-70",
+              index % 2 === 0 ? "bg-card" : "bg-background/40"
+            )
       )}
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
+        {deleteMode && (
+          <span
+            className={cn(
+              "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors mt-1 shrink-0",
+              selected ? "bg-destructive border-destructive" : "border-border bg-background"
+            )}
+          >
+            {selected && (
+              <span className="material-symbols-outlined text-[12px] text-white leading-none">
+                check
+              </span>
+            )}
+          </span>
+        )}
         <ProductIcon item={item} />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-sm text-foreground leading-tight">{item.name}</p>
@@ -100,7 +127,7 @@ function MobileItemCard({
             {item.category}
           </p>
         </div>
-        <StatusBadge status={item.status} />
+        {!deleteMode && <StatusBadge status={item.status} />}
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
@@ -144,10 +171,33 @@ interface InventoryTableProps {
   items: InventoryItem[];
   onUpdate?: (updated: InventoryItem) => void;
   onDelete?: (id: string) => void;
+  deleteMode?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  onSelectAll?: () => void;
 }
 
-export function InventoryTable({ items, onUpdate, onDelete }: InventoryTableProps) {
+export function InventoryTable({
+  items,
+  onUpdate,
+  onDelete,
+  deleteMode = false,
+  selectedIds = new Set(),
+  onToggleSelect,
+  onSelectAll,
+}: InventoryTableProps) {
   const [modal, setModal] = useState<ModalType>(null);
+  const allSelected = items.length > 0 && items.every((i) => selectedIds.has(i.id));
+  const someSelected = items.some((i) => selectedIds.has(i.id));
+
+  function handleRowClick(item: InventoryItem) {
+    if (deleteMode) {
+      onToggleSelect?.(item.id);
+    } else {
+      setModal(item);
+    }
+  }
+
   return (
     <>
       <ProductDetailsModal
@@ -156,22 +206,79 @@ export function InventoryTable({ items, onUpdate, onDelete }: InventoryTableProp
         onUpdate={onUpdate}
         onDelete={onDelete}
       />
-      
+
+      {/* ── Mobile ─────────────────────────────────────────────────── */}
       <div className="md:hidden divide-y divide-border/50">
+        {deleteMode && (
+          <div className="px-4 py-3 bg-destructive/5 border-b border-destructive/10 flex items-center gap-3">
+            <button
+              onClick={onSelectAll}
+              className="flex items-center gap-2 text-xs font-black text-destructive"
+            >
+              <span
+                className={cn(
+                  "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
+                  allSelected
+                    ? "bg-destructive border-destructive"
+                    : someSelected
+                    ? "bg-destructive/30 border-destructive"
+                    : "border-border bg-background"
+                )}
+              >
+                {(allSelected || someSelected) && (
+                  <span className="material-symbols-outlined text-[12px] text-white leading-none">
+                    {allSelected ? "check" : "remove"}
+                  </span>
+                )}
+              </span>
+              {allSelected ? "Deselect All" : "Select All"}
+            </button>
+            {selectedIds.size > 0 && (
+              <span className="text-[11px] text-muted-foreground ml-auto">
+                {selectedIds.size} selected
+              </span>
+            )}
+          </div>
+        )}
         {items.map((item, i) => (
           <MobileItemCard
             key={item.id}
             item={item}
             index={i}
-            onClick={() => setModal(item)}
+            deleteMode={deleteMode}
+            selected={selectedIds.has(item.id)}
+            onClick={() => handleRowClick(item)}
           />
         ))}
       </div>
 
+      {/* ── Desktop ────────────────────────────────────────────────── */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-muted/40">
+              {deleteMode && (
+                <th className="pl-8 pr-2 py-5 w-10">
+                  <button
+                    onClick={onSelectAll}
+                    aria-label={allSelected ? "Deselect all" : "Select all"}
+                    className={cn(
+                      "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
+                      allSelected
+                        ? "bg-destructive border-destructive"
+                        : someSelected
+                        ? "bg-destructive/30 border-destructive"
+                        : "border-border bg-background hover:border-destructive"
+                    )}
+                  >
+                    {(allSelected || someSelected) && (
+                      <span className="material-symbols-outlined text-[12px] text-white leading-none">
+                        {allSelected ? "check" : "remove"}
+                      </span>
+                    )}
+                  </button>
+                </th>
+              )}
               {HEADERS.map(({ label, className }) => (
                 <th
                   key={label}
@@ -188,17 +295,46 @@ export function InventoryTable({ items, onUpdate, onDelete }: InventoryTableProp
           <tbody className="divide-y divide-border/50">
             {items.map((item, i) => {
               const isOutOfStock = item.status === "out-of-stock";
+              const isSelected = selectedIds.has(item.id);
               return (
                 <tr
                   key={item.id}
                   className={cn(
-                    "hover:bg-primary/15 transition-all duration-300 cursor-pointer",
-                    isOutOfStock && "opacity-70",
-                    i % 2 === 0 ? "bg-card" : "bg-background/40"
+                    "transition-all duration-300 cursor-pointer",
+                    deleteMode
+                      ? isSelected
+                        ? "bg-destructive/8 hover:bg-destructive/12"
+                        : i % 2 === 0
+                        ? "bg-card hover:bg-destructive/5"
+                        : "bg-background/40 hover:bg-destructive/5"
+                      : cn(
+                          "hover:bg-primary/15",
+                          isOutOfStock && "opacity-70",
+                          i % 2 === 0 ? "bg-card" : "bg-background/40"
+                        )
                   )}
-                  onClick={() => setModal(item)}
+                  onClick={() => handleRowClick(item)}
                 >
-                  <td className="px-8 py-6">
+                  {deleteMode && (
+                    <td className="pl-8 pr-2 py-6">
+                      <span
+                        className={cn(
+                          "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
+                          isSelected
+                            ? "bg-destructive border-destructive"
+                            : "border-border bg-background"
+                        )}
+                      >
+                        {isSelected && (
+                          <span className="material-symbols-outlined text-[12px] text-white leading-none">
+                            check
+                          </span>
+                        )}
+                      </span>
+                    </td>
+                  )}
+
+                  <td className={cn("py-6", deleteMode ? "px-4" : "px-8")}>
                     <div className="flex items-center gap-4">
                       <ProductIcon item={item} />
                       <div>
