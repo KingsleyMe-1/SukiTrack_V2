@@ -1,37 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ThemeToggleButton } from "@/app/components/ui/ThemeToggleButton";
 import { AuthModal } from "@/app/components/landing/AuthModal";
 import Image from "next/image";
 
+function AuthModalController({
+  onAuthRequired,
+}: {
+  onAuthRequired: () => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("auth_required") === "true") {
+      onAuthRequired();
+    }
+  }, [searchParams, onAuthRequired]);
+
+  return null;
+}
+
 export function Navbar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTab, setModalTab] = useState<"signin" | "signup">("signin");
-  const searchParams = useSearchParams();
-
-  // Auto-open sign-in modal if middleware redirected an unauthenticated request
-  useEffect(() => {
-    if (searchParams.get("auth_required") === "true") {
-      setModalTab("signin");
-      setModalOpen(true);
-    }
-  }, [searchParams]);
-
-  function openSignIn() {
-    setModalTab("signin");
-    setModalOpen(true);
-  }
-
-  function openSignUp() {
-    setModalTab("signup");
-    setModalOpen(true);
-  }
 
   return (
     <>
+      <Suspense fallback={null}>
+        <AuthModalController
+          onAuthRequired={() => {
+            setModalTab("signin");
+            setModalOpen(true);
+          }}
+        />
+      </Suspense>
+
       <header className="w-full z-10 bg-background border-b border-border">
         <nav className="flex justify-between items-center px-6 md:px-8 py-4 max-w-7xl mx-auto">
           
