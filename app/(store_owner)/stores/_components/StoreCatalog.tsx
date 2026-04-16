@@ -110,7 +110,7 @@ export function StoreCatalog({ initialStores }: StoreCatalogProps) {
             )}
           </section>
 
-          <MarketIntelligenceBanner />
+          {/* <MarketIntelligenceBanner /> */}
         </div>
       </div>
     </>

@@ -23,7 +23,7 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
       <div className="flex items-center space-x-2">
         <ThemeToggleButton className="text-muted-foreground hover:bg-card hover:shadow-sm rounded-xl cursor-pointer" />
 
-        <div className="relative">
+        {/* <div className="relative">
           <button
             aria-label="View notifications"
             className="p-2.5 text-muted-foreground hover:bg-card hover:shadow-sm transition-all duration-200 rounded-xl cursor-pointer"
@@ -34,7 +34,7 @@ export function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
             className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background pointer-events-none"
             aria-hidden="true"
           />
-        </div>
+        </div> */}
 
         <Button label="Generate Report" backgroundColor="bg-primary" />
       </div>
