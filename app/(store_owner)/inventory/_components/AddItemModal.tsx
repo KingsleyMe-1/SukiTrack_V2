@@ -105,6 +105,15 @@ export function AddItemModal({ open, onClose, onAdd, stores, defaultStoreId }: A
     });
     setForm({ ...DEFAULT_FORM, storeId: defaultStoreId ?? "" });
     onClose();
+    console.log("Added item:", {
+      name: form.name.trim(),
+      category: form.category,
+      stockCount: form.stockCount,
+      cost: form.cost,
+      price: form.price,
+      storeId: form.storeId || undefined,
+      lastRestock: today,
+    });
   }
 
   return (

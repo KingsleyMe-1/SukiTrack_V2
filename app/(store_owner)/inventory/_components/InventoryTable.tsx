@@ -14,6 +14,7 @@ const HEADERS = [
   { label: "Price", className: "text-center" },
   { label: "Last Restock", className: "text-center" },
   { label: "Last Updated", className: "text-center" },
+  { label: "Action", className: "text-center" },
 ] as const;
 
 type ModalType = InventoryItem | null;
@@ -75,42 +76,39 @@ function ProductIcon({ item }: { item: InventoryItem }) {
 
 function MobileItemCard({
   item,
-  index,
   deleteMode,
   selected,
   onClick,
+  onSell,
 }: {
   item: InventoryItem;
   index: number;
   deleteMode?: boolean;
   selected?: boolean;
   onClick: () => void;
+  onSell?: (item: InventoryItem) => void;
 }) {
   const isOutOfStock = item.status === "out-of-stock";
+
   return (
     <div
       className={cn(
-        "px-4 py-4 cursor-pointer transition-colors",
-        deleteMode
-          ? selected
-            ? "bg-destructive/8"
-            : index % 2 === 0
-            ? "bg-card hover:bg-destructive/5"
-            : "bg-background/40 hover:bg-destructive/5"
-          : cn(
-              "hover:bg-primary/5",
-              isOutOfStock && "opacity-70",
-              index % 2 === 0 ? "bg-card" : "bg-background/40"
-            )
+        "bg-card rounded-2xl border shadow-sm overflow-hidden cursor-pointer transition-all active:scale-[0.99]",
+        deleteMode && selected
+          ? "border-destructive/40 bg-destructive/5"
+          : "border-border/60 hover:border-primary/20 hover:shadow-md",
+        isOutOfStock && !deleteMode && "opacity-75"
       )}
       onClick={onClick}
     >
-      <div className="flex items-start gap-3">
+      <div className="p-3.5 flex items-center gap-3">
         {deleteMode && (
           <span
             className={cn(
-              "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors mt-1 shrink-0",
-              selected ? "bg-destructive border-destructive" : "border-border bg-background"
+              "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors shrink-0",
+              selected
+                ? "bg-destructive border-destructive"
+                : "border-border bg-background"
             )}
           >
             {selected && (
@@ -120,49 +118,75 @@ function MobileItemCard({
             )}
           </span>
         )}
-        <ProductIcon item={item} />
+
+        {/* Product thumbnail */}
+        <div
+          className={cn(
+            "w-14 h-14 rounded-xl bg-muted overflow-hidden flex items-center justify-center border border-border/60 shrink-0",
+            isOutOfStock && "grayscale"
+          )}
+        >
+          {item.imageUrl ? (
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              width={56}
+              height={56}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <span className="material-symbols-outlined text-muted-foreground text-2xl">
+              inventory_2
+            </span>
+          )}
+        </div>
+
+        {/* Content */}
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-sm text-foreground leading-tight">{item.name}</p>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-            {item.category}
-          </p>
-        </div>
-        {!deleteMode && <StatusBadge status={item.status} />}
-      </div>
+          {/* Row 1: name + status badge */}
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-bold text-sm text-foreground leading-snug line-clamp-1">
+              {item.name}
+            </p>
+            {!deleteMode && <StatusBadge status={item.status} />}
+          </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-            Stock
+          {/* Row 2: stock count */}
+          <p className="text-xs text-muted-foreground mt-1 font-medium">
+            Stock:{" "}
+            <span
+              className={cn(
+                "font-black",
+                isOutOfStock ? "text-destructive" : "text-foreground"
+              )}
+            >
+              {item.stockCount} units
+            </span>
           </p>
-          <p className={cn("font-bold text-sm", isOutOfStock ? "text-destructive" : "text-foreground")}>
-            {item.stockCount}
-            <span className="text-[10px] font-medium text-muted-foreground ml-0.5">units</span>
-          </p>
-        </div>
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-            Cost
-          </p>
-          <p className="text-xs text-muted-foreground">{formatPHP(item.cost)}</p>
-        </div>
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-            Price
-          </p>
-          <p className="font-black text-sm text-primary">{formatPHP(item.price)}</p>
+
+          {/* Row 3: price + sold button */}
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-sm font-black text-primary">{formatPHP(item.price)}</p>
+            {!deleteMode && (
+              <button
+                disabled={isOutOfStock}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isOutOfStock) onSell?.(item);
+                }}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all",
+                  isOutOfStock
+                    ? "bg-muted text-muted-foreground/50 cursor-not-allowed"
+                    : "bg-primary text-primary-foreground shadow-sm shadow-primary/25 hover:scale-105 active:scale-95 cursor-pointer"
+                )}
+              >
+                Sold
+              </button>
+            )}
+          </div>
         </div>
       </div>
-
-      <p className="mt-2 text-[10px] text-muted-foreground font-medium">
-        Last Restock: {formatRestockDate(item.lastRestock)}
-      </p>
-      {item.lastUpdated && (
-        <p className="mt-1 text-[10px] font-medium">
-          <span className="text-muted-foreground">Updated: </span>
-          <span className="text-primary font-black">{formatLastUpdated(item.lastUpdated)}</span>
-        </p>
-      )}
     </div>
   );
 }
@@ -171,6 +195,7 @@ interface InventoryTableProps {
   items: InventoryItem[];
   onUpdate?: (updated: InventoryItem) => void;
   onDelete?: (id: string) => void;
+  onSell?: (item: InventoryItem) => void;
   deleteMode?: boolean;
   selectedIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
@@ -183,6 +208,7 @@ export function InventoryTable({
   items,
   onUpdate,
   onDelete,
+  onSell,
   deleteMode = false,
   selectedIds = new Set(),
   onToggleSelect,
@@ -213,9 +239,9 @@ export function InventoryTable({
       />
 
       {/* ── Mobile ─────────────────────────────────────────────────── */}
-      <div className="md:hidden divide-y divide-border/50">
+      <div className="md:hidden space-y-2.5 p-3">
         {deleteMode && (
-          <div className="px-4 py-3 bg-destructive/5 border-b border-destructive/10 flex items-center gap-3">
+          <div className="px-3 py-2.5 bg-destructive/5 rounded-xl border border-destructive/10 flex items-center gap-3">
             <button
               onClick={onSelectAll}
               className="flex items-center gap-2 text-xs font-black text-destructive"
@@ -246,14 +272,15 @@ export function InventoryTable({
           </div>
         )}
 
-        {items.map((item, i) => (
+        {items.map((item) => (
           <MobileItemCard
             key={item.id}
             item={item}
-            index={i}
+            index={0}
             deleteMode={deleteMode}
             selected={selectedIds.has(item.id)}
             onClick={() => handleRowClick(item)}
+            onSell={onSell}
           />
         ))}
       </div>
@@ -387,6 +414,24 @@ export function InventoryTable({
                     ) : (
                       <span className="text-muted-foreground/50">—</span>
                     )}
+                  </td>
+
+                  <td className="px-6 py-6 text-center">
+                    <button
+                      disabled={isOutOfStock}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isOutOfStock) onSell?.(item);
+                      }}
+                      className={cn(
+                        "px-4 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all",
+                        isOutOfStock
+                          ? "bg-muted text-muted-foreground/50 cursor-not-allowed"
+                          : "bg-primary text-primary-foreground shadow-sm shadow-primary/25 hover:scale-105 active:scale-95 cursor-pointer"
+                      )}
+                    >
+                      Sold
+                    </button>
                   </td>
                 </tr>
               );

@@ -125,18 +125,6 @@ export function FilterBar({
           />
         </div>
       </div>
-
-      <div className="md:ml-auto flex items-center gap-2 text-muted-foreground/60">
-        <span className="text-[9px] font-bold uppercase tracking-tighter">
-          Last Sync: 5 mins ago
-        </span>
-        <span
-          className="material-symbols-outlined text-base cursor-pointer hover:rotate-180 transition-transform duration-500"
-          aria-hidden="true"
-        >
-          sync
-        </span>
-      </div>
     </div>
   );
 }

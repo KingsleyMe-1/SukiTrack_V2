@@ -9,6 +9,8 @@ import { BulkRestockModal } from "./BulkRestockModal";
 import { AddItemModal } from "./AddItemModal";
 import Header from "./Header";
 import { FloatingActionButton } from "@/app/(store_owner)/_components/FloatingActionButton";
+import { addInventoryItemAction, recordSaleAction } from "../actions";
+import { RecordSaleModal } from "./RecordSaleModal";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -39,12 +41,29 @@ export function InventoryCatalog({ items, categories, stores }: InventoryCatalog
   const [showAddItem, setShowAddItem] = useState(false);
   const [showBulkRestock, setShowBulkRestock] = useState(false);
   const [productModalOpen, setProductModalOpen] = useState(false);
+  const [saleItem, setSaleItem] = useState<InventoryItem | null>(null);
 
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  function handleAdd(newItem: InventoryItem) {
+  async function handleAdd(newItem: InventoryItem) {
     setLocalItems((prev) => [newItem, ...prev]);
+    try {
+      const created = await addInventoryItemAction({
+        name: newItem.name,
+        category: newItem.category,
+        status: newItem.status,
+        stockCount: newItem.stockCount,
+        cost: newItem.cost,
+        price: newItem.price,
+        lastRestock: newItem.lastRestock,
+        storeId: newItem.storeId,
+        imageUrl: newItem.imageUrl,
+      });
+      setLocalItems((prev) => prev.map((i) => (i.id === newItem.id ? created : i)));
+    } catch {
+      setLocalItems((prev) => prev.filter((i) => i.id !== newItem.id));
+    }
   }
 
   function handleUpdate(updated: InventoryItem) {
@@ -54,6 +73,25 @@ export function InventoryCatalog({ items, categories, stores }: InventoryCatalog
   function handleDelete(id: string) {
     setLocalItems((prev) => prev.filter((i) => i.id !== id));
     setCurrentPage(1);
+  }
+
+  function handleSell(item: InventoryItem) {
+    setSaleItem(item);
+  }
+
+  function handleSaleRecorded(
+    itemId: string,
+    newStockCount: number,
+    newStatus: InventoryItem["status"]
+  ) {
+    setLocalItems((prev) =>
+      prev.map((i) =>
+        i.id === itemId
+          ? { ...i, stockCount: newStockCount, status: newStatus }
+          : i
+      )
+    );
+    setSaleItem(null);
   }
 
   function handleToggleDeleteMode() {
@@ -154,6 +192,16 @@ export function InventoryCatalog({ items, categories, stores }: InventoryCatalog
 
   return (
     <>
+      <RecordSaleModal
+        item={saleItem}
+        onClose={() => setSaleItem(null)}
+        onSaleRecorded={handleSaleRecorded}
+        onRecordSale={async (payload) => {
+          const result = await recordSaleAction(payload);
+          return { newStockCount: result.newStockCount, newStatus: result.newStatus };
+        }}
+      />
+
       <AddItemModal
         open={showAddItem}
         onClose={() => setShowAddItem(false)}
@@ -195,11 +243,12 @@ export function InventoryCatalog({ items, categories, stores }: InventoryCatalog
           onStoreChange={handleStoreChange}
         />
 
-        <div className="bg-card rounded-3xl border border-border shadow overflow-hidden mb-12">
+        <div className="md:bg-card md:rounded-3xl md:border md:border-border md:shadow md:overflow-hidden mb-12">
           <InventoryTable
             items={paginated}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
+            onSell={handleSell}
             deleteMode={deleteMode}
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
@@ -216,7 +265,7 @@ export function InventoryCatalog({ items, categories, stores }: InventoryCatalog
         </div>
       </div>
 
-      {!showAddItem && !showBulkRestock && !productModalOpen && (
+      {!showAddItem && !showBulkRestock && !productModalOpen && !saleItem && (
         <FloatingActionButton onClick={() => setShowAddItem(true)} />
       )}
     </>

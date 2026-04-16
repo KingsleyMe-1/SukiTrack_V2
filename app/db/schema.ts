@@ -79,3 +79,36 @@ export const customers = pgTable("customers", {
   avatarColorClass: text("avatar_color_class").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+// ── sold_items ─────────────────────────────────────────────────────────────
+// Records every individual sale transaction.
+// Item name & price are snapshotted so the record stays meaningful even if
+// the inventory item is later edited or deleted.
+
+export const soldItems = pgTable("sold_items", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  /** FK to the source inventory item (nullable — preserved if item is deleted) */
+  inventoryItemId: text("inventory_item_id").references(
+    () => inventoryItems.id,
+    { onDelete: "set null" }
+  ),
+  storeId: text("store_id").references(() => stores.id, {
+    onDelete: "set null",
+  }),
+  /** Scopes the record to its store owner */
+  ownerId: text("owner_id").notNull(),
+  /** Snapshot of item name at time of sale */
+  itemName: text("item_name").notNull(),
+  quantitySold: integer("quantity_sold").notNull(),
+  pricePerUnit: real("price_per_unit").notNull(),
+  totalAmount: real("total_amount").notNull(),
+  /** "walking" | "vip" | "named" */
+  customerType: text("customer_type").notNull().default("walking"),
+  /** Free-text customer name (null for walking customers) */
+  customerName: text("customer_name"),
+  /** FK to customers table if a registered suki was selected */
+  customerId: text("customer_id").references(() => customers.id, {
+    onDelete: "set null",
+  }),
+  soldAt: timestamp("sold_at").notNull().defaultNow(),
+});
